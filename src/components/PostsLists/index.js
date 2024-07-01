@@ -18,20 +18,20 @@ import {ptBR} from 'date-fns/locale';
 import firestore from '@react-native-firebase/firestore';
 
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {firebase} from '@react-native-firebase/auth';
+
+import {useNavigation} from '@react-navigation/native';
 
 export function PostsLists({data, userId}) {
+  const navigation = useNavigation();
   const [likesPost, setLikesPost] = useState(data?.likes);
 
   async function handleLikePost(id, likes) {
-    console.log(id);
-    console.log(likes);
-    console.log(userId);
     const docId = `${userId}_${id}`;
 
     const doc = await firestore().collection('likes').doc(docId).get();
 
     if (doc.exists) {
+      //aq eu diminuo lá no post um like
       await firestore()
         .collection('post')
         .doc(id)
@@ -42,6 +42,7 @@ export function PostsLists({data, userId}) {
           console.log('erro ao apagar', err);
         });
 
+      //aq eu deleto o like
       await firestore()
         .collection('likes')
         .doc(docId)
@@ -56,6 +57,8 @@ export function PostsLists({data, userId}) {
       return;
     }
 
+    //aq eu crio a coleção like
+
     await firestore()
       .collection('likes')
       .doc(docId)
@@ -66,6 +69,8 @@ export function PostsLists({data, userId}) {
       .catch(err => {
         console.log('erro ao enviar os dados', err);
       });
+
+    //aq eu adiciono o like no post e adiciono a propriedade post
 
     await firestore()
       .collection('post')
@@ -91,7 +96,13 @@ export function PostsLists({data, userId}) {
 
   return (
     <Container>
-      <Header>
+      <Header
+        onPress={() =>
+          navigation.navigate('PostsUser', {
+            title: data.autor,
+            userId: data.userId,
+          })
+        }>
         {data.avatarUrl ? (
           <Avatar source={{uri: data.avatarUrl}} />
         ) : (

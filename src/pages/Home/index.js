@@ -86,7 +86,6 @@ export function Home() {
 
   useFocusEffect(
     useCallback(() => {
-      console.log(user);
       let isActive = true;
 
       function fetchPosts() {
